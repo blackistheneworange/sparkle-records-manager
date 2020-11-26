@@ -5,11 +5,11 @@ Provide MongoDB url in the MONGO_URI environment variable to access the database
 
 ### Client app
 cd client && npm i && npm start
-Listens on port 8080 (http://localhost:8080)
+#### Listens on port 8080 (http://localhost:8080)
 
 ### Server app
 npm i && npm start
-Listens on port 3000 (http://localhost:3000)
+#### Listens on port 3000 (http://localhost:3000)
 
 ### State management
 Redux is used to manage the state of the application
