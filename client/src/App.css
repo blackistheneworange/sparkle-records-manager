@@ -1,0 +1,42 @@
+/*Header*/
+.pageTitle{
+    color:#000;
+    display:flex;
+    align-items:center;
+    flex-basis:auto;
+}
+
+/*Main*/
+.gallery{
+    display:flex;
+    flex-wrap:wrap;
+}
+.gallery > img {
+    margin:0 8px 4px 0;
+}
+.gallery>.imageHolder{
+    position:relative;
+}
+.gallery > .imageHolder > img {
+    margin:0 8px 4px 4px;
+    width:16%;
+}
+.gallery>.imageHolder>.deleteButton{
+    position:absolute;
+    top:0;
+    right:0;
+    border-radius:50%;
+}
+
+/*Footer*/
+footer{
+    padding:24px;
+    background:#f8f8f8;
+    border:1px solid #e6e6e6;
+    margin:200px 0 0 0;
+    display:flex !important;
+    justify-content: center !important;
+}
+footer img {
+    width:40px;
+}
