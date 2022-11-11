@@ -46,27 +46,27 @@ function CreateRecord({record, errors, onChange, create, open, onClose, onSubmit
             />
 
             <Form.Field>
-                <label htmlFor="sex">Sex</label>
-                <select id="sex" placeholder='Select your sex' value={record.sex} onChange={onChange} name='sex' required={true}>
+                <label htmlFor="gender">gender</label>
+                <select id="gender" placeholder='Select your gender' value={record.gender} onChange={onChange} name='gender' required={true}>
                   {genderOptions.map(g=>
                     <option key={g} value={g}>{g}</option>
                   )}
                 </select>
             </Form.Field>
 
-            <Form.Field>
+            {/* <Form.Field>
                 <label htmlFor="gallery">Gallery (Can upload multiple files)</label>
                 <input id="gallery" type='file' onChange={onChange} name='gallery' multiple/>
-            </Form.Field>
+            </Form.Field> */}
 
-            <div className='gallery'>
+            {/* <div className='gallery'>
                 {record.gallery.map((file)=>
                     <div key={`image_${file.id}`} className='imageHolder'>
                         <Image src={file.src} size='small' />
                         <Button color='red' data-id={file.id} onClick={onDeleteImage} size='small' icon='delete' className='deleteButton'></Button>
                     </div>
                 )}
-            </div>
+            </div> */}
 
             <Button type='submit' style={{display:'none'}}/>
         </Form>

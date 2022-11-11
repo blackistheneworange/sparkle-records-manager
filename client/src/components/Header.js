@@ -10,7 +10,7 @@ const HeaderComponent = () => (
                     <Icon name='book' size='large' style={{color:'#313131'}} />
                     <Header.Content>
                         Sparkle Records System
-                        <Header.Subheader>Manage records like never before</Header.Subheader>
+                        <Header.Subheader>Manage records on the go</Header.Subheader>
                     </Header.Content>
                 </Link>
             </div>

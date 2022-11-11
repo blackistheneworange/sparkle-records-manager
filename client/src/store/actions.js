@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {API_URL} from '../../config';
 
-//const data = [{_id:1, name:'Hari',email:'ash',age:22,sex:'Male',gallery:['https://react.semantic-ui.com/images/avatar/small/lena.png','https://react.semantic-ui.com/images/avatar/small/lena.png']}, {_id:2, name:'Haaari',email:'awdsh',age:222,sex:'Male',gallery:['https://react.semantic-ui.com/images/avatar/small/lena.png']}]
+//const data = [{id:1, name:'Hari',email:'ash',age:22,gender:'Male',gallery:['https://react.semantic-ui.com/images/avatar/small/lena.png','https://react.semantic-ui.com/images/avatar/small/lena.png']}, {id:2, name:'Haaari',email:'awdsh',age:222,gender:'Male',gallery:['https://react.semantic-ui.com/images/avatar/small/lena.png']}]
 const uri = 'data:image/jpg;base64,';
 
 
@@ -13,8 +13,8 @@ export const fetchRecords = () => async (dispatch) => {
         for(const d of data){
             const urls = [];
             let id=1;
-            for(const g of d.gallery) urls.push(await blobToDataURL(new Blob([new Uint8Array(g.data)])))
-            data = data.map(single=>single._id==d._id?{...single,gallery:urls.map(url=>({id:id++, src:url}))} : single)
+            if(d.gallery) for(const g of d.gallery) urls.push(await blobToDataURL(new Blob([new Uint8Array(g.data)])))
+            data = data.map(single=>single.id==d.id?{...single,gallery:urls.map(url=>({id:id++, src:url}))} : single)
         }
         dispatch({
             type:'SET_RECORDS',
@@ -26,72 +26,73 @@ export const fetchRecords = () => async (dispatch) => {
     }
 }
 
-export const createRecord = ({_id,name, email, age, sex, gallery, galleryFiles}, socket=false) => async (dispatch) => {
+export const createRecord = ({id,name, email, age, gender, gallery, galleryFiles}, socket=false) => async (dispatch) => {
     
     try{
-        let data, id=1, urls=[];
+        let data, urls=[];
         if(!socket){
             const fd = new FormData();
             fd.append('name',name);
             fd.append('email',email);
             fd.append('age',age);
-            fd.append('sex',sex);
+            fd.append('gender',gender);
             for(let i=0;i<galleryFiles.length;i++){
                 fd.append(`images`, galleryFiles[i].file)
             }
             const res = await axios.post(`${API_URL}/api/records`, fd, {headers:{'Content-Type':'multipart/form-data'}});
             data=res.data;
-            for(const g of data.gallery){
-                urls.push(await blobToDataURL(new Blob([new Uint8Array(g.data)])))
-            }
+            // for(const g of data.gallery){
+            //     urls.push(await blobToDataURL(new Blob([new Uint8Array(g.data)])))
+            // }
         }
         else{
-            for(const g of gallery){
-                urls.push(await blobToDataURL(new Blob([new Uint8Array(g.data)])))
-            }
+            // for(const g of gallery){
+            //     urls.push(await blobToDataURL(new Blob([new Uint8Array(g.data)])))
+            // }
         }
         dispatch({
             type:'CREATE_RECORD',
-            payload: socket ? {_id,name, email, age, sex, gallery:urls.map(url=>({ id:id++, src:url}))} : {...data,gallery:urls.map(url=>({ id:id++, src:url}))}
+            // payload: socket ? {id,name, email, age, gender, gallery:urls.map(url=>({ id:id++, src:url}))} : {...data,gallery:urls.map(url=>({ id:id++, src:url}))}
+            payload: {id:data.id,name, email, age, gender}
         })
-        return socket ? true : data;
+        return {id:data.id,name, email, age, gender}
     }
     catch(e){
         throw e;
     }
 }
 
-export const updateRecord = ({_id, name, email, age, sex, gallery, galleryFiles}, socket=false) => async (dispatch) => {
-    
+export const updateRecord = ({id, name, email, age, gender, gallery, galleryFiles}, socket=false) => async (dispatch) => {
     try{
-        let data,urls=[],id=1;
+        let data,urls=[];
         if(!socket){
             const fd = new FormData();
             fd.append('name',name);
             fd.append('email',email);
             fd.append('age',age);
-            fd.append('sex',sex);
+            fd.append('gender',gender);
             for(let i=0;i<galleryFiles.length;i++){
                 fd.append(`images`, galleryFiles[i].file)
             }
-            const res = await axios.put(`${API_URL}/api/records/${_id}`, fd, {headers:{'Content-Type':'multipart/form-data'}});
+            const res = await axios.put(`${API_URL}/api/records/${id}`, fd, {headers:{'Content-Type':'multipart/form-data'}});
             data = res.data;
-            for(const g of data.gallery){
-                urls.push(dataURLtoBlob(g))
-            }
-            data.gallery= urls;
+            // for(const g of data.gallery){
+            //     urls.push(dataURLtoBlob(g))
+            // }
+            // data.gallery= urls;
         }
         else{
-            for(const g of gallery){
-                urls.push(await blobToDataURL(new Blob([new Uint8Array(g)])))
-            }
+            // for(const g of gallery){
+            //     urls.push(await blobToDataURL(new Blob([new Uint8Array(g)])))
+            // }
         }
     
         dispatch({
             type:'UPDATE_RECORD',
-            payload: {_id, name, email, age, sex, gallery: socket ? urls.map(url=>({ id:id++, src:url})) : gallery.map(g=>g.new ? {...g, new:undefined} : g)}
+            // payload: {id, name, email, age, gender, gallery: socket ? urls.map(url=>({ id:id++, src:url})) : gallery.map(g=>g.new ? {...g, new:undefined} : g)}
+            payload: {id:data.id,name, email, age, gender}
         })
-        return socket ? true : data;
+        return data;
     }
     catch(e){
         throw e;
@@ -101,10 +102,8 @@ export const updateRecord = ({_id, name, email, age, sex, gallery, galleryFiles}
 export const deleteRecords = (ids, socket=false) => async (dispatch) => {
     
     try{
-        if(!socket){
-            for(const id of ids){
-                await axios.delete(`${API_URL}/api/records/${id}`);
-            }
+        for(const id of ids){
+            await axios.delete(`${API_URL}/api/records/${id}`);
         }
         dispatch({
             type:'DELETE_RECORDS',

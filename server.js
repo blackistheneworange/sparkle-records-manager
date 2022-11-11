@@ -2,12 +2,11 @@ const express = require('express');
 const app = express();
 const path = require('path');
 const http = require('http').createServer(app);
-const io = require('socket.io')(http);
 const bodyParser = require('body-parser');
 const indexRouter = require('./src/routes');
 
 //Basic app
-const port = process.env.PORT || 3000;
+const port = process.env.PORT2 || 3000;
 const appName = 'Sparkle Records Manager';
 
 //middlewares
@@ -33,33 +32,6 @@ app.use((err, req, res, next)=>{
     return res.status(err.status||500).send(err.message||err);
 })
 
-//socket
-let clients = 0;
-io.on('connection', (socket) => {
-    ++clients;
-    io.emit('client',clients)
-
-    //add record
-    socket.on('add',(data)=>{
-        socket.broadcast.emit('add',data)
-    })
-
-    //update record
-    socket.on('update',(data)=>{
-        socket.broadcast.emit('update',data)
-    })
-
-    //delete record
-    socket.on('delete',(data)=>{
-        socket.broadcast.emit('delete',data)
-    })
-
-    //disconnect
-    socket.on('disconnect', () => {
-        --clients;
-        io.emit('client', clients)
-    });
-});
 
 http.listen(port,()=>{
     console.log(`${appName} listening on port ${port}`);

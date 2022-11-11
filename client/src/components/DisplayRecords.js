@@ -30,24 +30,26 @@ const DisplayRecords = ({clients, createRecord, records, deleteRecords, selectRe
                 <Button basic disabled={selectedRecords.length!==1} size='small' color='orange' onClick={openExistingRecord} content='Edit'/>
                 <Button basic disabled={selectedRecords.length<1} size='small' color='red' onClick={deleteRecords} loading={isDeleting}>Delete</Button>
                 {/*<Button size='small' name='deleteAll' color='red' onClick={deleteRecords}>Delete All</Button>*/}
-                <Step style={{display:'flex', marginTop:'12px'}}>
+                {/* <Step style={{display:'flex', marginTop:'12px'}}>
                     <Icon name='user' />
                     <Step.Content>
                         <Step.Title>Online users - {clients}</Step.Title>
                     </Step.Content>
-                </Step>
+                </Step> */}
                 </Table.HeaderCell>
             </Table.Row>
             </Table.Header>
 
             <Table.Header>
             <Table.Row>
-                <Table.HeaderCell />
+                <Table.Cell collapsing>
+                    <Checkbox checked={selectedRecords.length > 0 && selectedRecords.length === records.length} onChange={selectRecord} disabled={records.length===0}/>
+                </Table.Cell>
                 <Table.HeaderCell>Name</Table.HeaderCell>
                 <Table.HeaderCell>E-mail address</Table.HeaderCell>
                 <Table.HeaderCell>Age</Table.HeaderCell>
                 <Table.HeaderCell>Gender</Table.HeaderCell>
-                <Table.HeaderCell>Gallery</Table.HeaderCell>
+                {/* <Table.HeaderCell>Gallery</Table.HeaderCell> */}
             </Table.Row>
             </Table.Header>
             <Table.Body>
@@ -58,21 +60,21 @@ const DisplayRecords = ({clients, createRecord, records, deleteRecords, selectRe
                     </Table.Cell>
                 </Table.Row>
             : records.map(record=>
-                <Table.Row key={record._id}>
+                <Table.Row key={record.id}>
                     <Table.Cell collapsing>
-                        <Checkbox checked={selectedRecords.includes(record._id)?true:false} onChange={selectRecord} data-id={record._id}/>
+                        <Checkbox checked={selectedRecords.includes(record.id)?true:false} onChange={selectRecord} data-id={record.id}/>
                     </Table.Cell>
                     <Table.Cell>{record.name}</Table.Cell>
                     <Table.Cell>{record.email}</Table.Cell>
                     <Table.Cell>{+record.age}</Table.Cell>
-                    <Table.Cell>{record.sex}</Table.Cell>
-                    <Table.Cell>
+                    <Table.Cell>{record.gender}</Table.Cell>
+                    {/* <Table.Cell>
                         <div className='gallery'>
                             {record.gallery.map(g=>
                                 <Image key={`imageDisplay_${g.id}`} src={g.src} style={{cursor:'pointer'}} onClick={handleZoomImage} rounded size='mini' />
                             )}
                         </div>
-                    </Table.Cell>
+                    </Table.Cell> */}
                 </Table.Row>
             )}
             </Table.Body>

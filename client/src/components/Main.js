@@ -1,6 +1,5 @@
 import React, {useState, useEffect} from 'react';
 import {connect} from 'react-redux';
-import io from 'socket.io-client';
 import Header from './Header';
 import Footer from './Footer';
 import CreateRecord from './CreateRecord';
@@ -8,13 +7,12 @@ import DisplayRecords from './DisplayRecords';
 import {API_URL} from '../../config';
 import {fetchRecords, createRecord, deleteRecords, updateRecord} from '../store/actions';
 
-let socket;
 
 const Main = ({store:{records}, fetchRecords, createRecord, deleteRecords, updateRecord}) => {
 
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [updateModalOpen, setUpdateModalOpen] = useState(false);
-    const [newRecord, setNewRecord] = useState({name:'', email:'', age:'', sex:'Male', gallery:[], galleryFiles:[]});
+    const [newRecord, setNewRecord] = useState({name:'', email:'', age:'', gender:'Male', gallery:[], galleryFiles:[]});
     const [errors, setErrors] = useState({age:false, name:false, email:false});
     const [selectedRecords, setSelectedRecords] = useState([]);
     const [connectedClients, setConnectedClients] = useState(1);
@@ -25,7 +23,6 @@ const Main = ({store:{records}, fetchRecords, createRecord, deleteRecords, updat
     useEffect(()=>{
         (async ()=>{
             try{
-                initiateSocket();
                 setIsLoading(true);
                 await fetchRecords();
             }
@@ -39,7 +36,7 @@ const Main = ({store:{records}, fetchRecords, createRecord, deleteRecords, updat
     },[])
 
     useEffect(()=>{
-        if(!createModalOpen && !updateModalOpen) setNewRecord({name:'', email:'', age:'', sex:'Male', gallery:[], galleryFiles:[]});
+        if(!createModalOpen && !updateModalOpen) setNewRecord({name:'', email:'', age:'', gender:'Male', gallery:[], galleryFiles:[]});
     },[createModalOpen, updateModalOpen])
 
     const openCreateRecordModal = () => {
@@ -47,7 +44,7 @@ const Main = ({store:{records}, fetchRecords, createRecord, deleteRecords, updat
     }
 
     const openUpdateRecordModal = () => {
-        const record = selectedRecords.length===1 ? records.find(r=>r._id==selectedRecords[0]) : null;
+        const record = selectedRecords.length===1 ? records.find(r=>r.id==selectedRecords[0]) : null;
         if(!record) return;
         setNewRecord({...record, galleryFiles:[]});
         setUpdateModalOpen(true);
@@ -99,22 +96,33 @@ const Main = ({store:{records}, fetchRecords, createRecord, deleteRecords, updat
     }
 
     const handleSelectRecord = (e) => {
-        const id = e.currentTarget.getAttribute('data-id');
-        if(!id) return;
-        if(!selectedRecords.includes(id)) setSelectedRecords([...selectedRecords, id])
-        else setSelectedRecords(selectedRecords.filter(r=>r!=id))
+        const id = +(e.currentTarget.getAttribute('data-id'));
+        if(!id){
+            if(selectedRecords.length > 0){
+                setSelectedRecords([]);
+            }
+            else{
+                setSelectedRecords(records.map(r => r.id));
+            }
+        }
+        else if(!selectedRecords.includes(id)) {
+            setSelectedRecords([...selectedRecords, id])
+        }
+        else{
+            setSelectedRecords(selectedRecords.filter(r=>r!=id))
+        }
     }
 
 
     const handleDeleteRecords = async (e) => {
         setIsDeleting(true);
         if(e.currentTarget.name==='deleteAll'){
-            await deleteRecords(records.map(r=>r._id));
-            socket.emit('delete',records.map(r=>r._id))
+            await deleteRecords(records.map(r=>r.id));
+            // socket.emit('delete',records.map(r=>r.id))
         }
         else{
             await deleteRecords(selectedRecords);
-            socket.emit('delete',selectedRecords);
+            // socket.emit('delete',selectedRecords);
         }
         setIsDeleting(false);
         setSelectedRecords([]);
@@ -147,13 +155,13 @@ const Main = ({store:{records}, fetchRecords, createRecord, deleteRecords, updat
             setIsCreating(true);
             if(updateModalOpen){
                 const updatedRecord = await updateRecord(newRecord);
-                socket.emit('update',updatedRecord);
+                // socket.emit('update',updatedRecord);
                 setUpdateModalOpen(false);
                 setSelectedRecords([]);
             }
             else{
                 const newRecordWithId = await createRecord(newRecord);
-                socket.emit('add',newRecordWithId);
+                // socket.emit('add',newRecordWithId);
                 setCreateModalOpen(false);
             }
         }
@@ -163,22 +171,6 @@ const Main = ({store:{records}, fetchRecords, createRecord, deleteRecords, updat
         finally{
             setIsCreating(false);
         }
-    }
-
-    const initiateSocket = () => {
-        socket = io.connect(API_URL,{"transports" : ["websocket"]});
-        socket.on('client',(data)=>{
-            setConnectedClients(data);
-        })
-        socket.on('add',(data)=>{
-            createRecord(data, true);
-        })
-        socket.on('update',(data)=>{
-            updateRecord(data,true);
-        })
-        socket.on('delete',(data)=>{
-            deleteRecords(data, true);
-        })
     }
 
     return(

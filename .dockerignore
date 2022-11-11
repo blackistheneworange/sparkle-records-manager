@@ -1,8 +1,12 @@
-public/
 node_modules
+npm-debug.log
 package-lock.json
+.git
+.gitignore
 
 client/node_modules
 client/package-lock.json
+client/.git
+client/.gitignore
 
 db.sqlite
