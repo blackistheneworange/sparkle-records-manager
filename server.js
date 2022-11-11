@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const indexRouter = require('./src/routes');
 
 //Basic app
-const port = process.env.PORT2 || 3000;
+const port = process.env.PORT || 3000;
 const appName = 'Sparkle Records Manager';
 
 //middlewares

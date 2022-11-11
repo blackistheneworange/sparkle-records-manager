@@ -1,0 +1,2 @@
+docker stop $(docker ps -q --filter ancestor=sparkle-records-manager )
+docker rmi -f $(docker images | grep 'sparkle-records-manager')

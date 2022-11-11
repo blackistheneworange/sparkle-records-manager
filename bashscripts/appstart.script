@@ -1,0 +1,2 @@
+docker stop $(docker ps -q --filter ancestor=sparkle-records-manager )
+docker run -p 8000:8000 -e PORT=8000 -d sparkle-records-manager
